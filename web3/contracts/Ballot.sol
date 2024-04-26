@@ -1,5 +1,33 @@
 // SPDX-License-Identifier: GPL-3.0
 
+//Proof of stake is Algorithm that is used to achieve consensus in a blockchain network.
+
+// post requust to network  transactions pool (pending transactions)
+
+// one man and the second man;
+
+//Default both sides have a generated public key and private key;
+
+// One man decide to send 10 ether to second man;
+
+//Second man provide his public key to first and the first is using his private key to sign the transaction;
+
+//The transaction is sent to the network;
+//The network is verifying the transaction by using the public
+
+//
+
+//XRPL seed of wallet some of kind of request to network;
+//respond generates public key and private key;
+
+// transaction pool -> miners -> block -> blockchain
+
+// Transaction pool
+
+// 20 node;
+
+// 0  genesis block
+
 pragma solidity >=0.7.0 <0.9.0;
 
 /**
@@ -10,7 +38,10 @@ contract Ballot {
     struct Voter {
         uint weight; // weight is accumulated by delegation
         bool voted; // if true, that person already voted
+        //address is a 20 byte value;
         address delegate; // person delegated to
+        // uint is unsigned integer, 256 bits
+        // int is signed integer, 256 bits
         uint vote; // index of the voted proposal
     }
 
@@ -99,8 +130,8 @@ contract Ballot {
 
         // If 'proposal' is out of the range of the array,
         // this will throw automatically and revert all
-        // changes.
         proposals[proposal].voteCount += sender.weight;
+        // changes.
     }
 
     /**
