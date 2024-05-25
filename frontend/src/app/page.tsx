@@ -1,5 +1,4 @@
 import Candidate from "@/components/Candidate";
-import Connection from "@/components/Connection";
 import Biden from "../app/images/biden.jpeg";
 import Trump from "../app/images/trump.jpeg";
 import Header from "@/components/Header";
@@ -10,7 +9,6 @@ export default function Home() {
     <div className="bg-gradient-to-tl flex justify-between">
       <main className="">
         <Header />
-        <Connection />
 
         <div className="flex gap-28">
           <div className="flex justify-between gap-28">
