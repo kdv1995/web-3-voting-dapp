@@ -1,17 +1,23 @@
 "use client";
-import { useState } from "react";
+
+import { credentials } from "@/constants";
+import { Web3Context } from "@/context/providerContext";
 import { ethers } from "ethers";
+import { useContext } from "react";
 
 export default function ConnectButton() {
-  const [connected, setConnected] = useState(false);
-
-  const connectToMetaMask = async () => {
-    setConnected(true);
-  };
+  const { connectWallet, contract, provider, setProvider } =
+    useContext(Web3Context);
 
   return (
-    <button className="text-white p-3" onClick={connectToMetaMask}>
-      {connected ? "Connected" : "Connect to MetaMask"}
-    </button>
+    <div>
+      <span className="text-white p-3">Want to vote?</span>
+      <button
+        onClick={connectWallet}
+        className="text-white bg-red-950 p-3 rounded-lg"
+      >
+        {provider ? "Connected" : "Connect Wallet"}
+      </button>
+    </div>
   );
 }

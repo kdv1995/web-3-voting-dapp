@@ -1,33 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0
 
-//Proof of stake is Algorithm that is used to achieve consensus in a blockchain network.
-
-// post requust to network  transactions pool (pending transactions)
-
-// one man and the second man;
-
-//Default both sides have a generated public key and private key;
-
-// One man decide to send 10 ether to second man;
-
-//Second man provide his public key to first and the first is using his private key to sign the transaction;
-
-//The transaction is sent to the network;
-//The network is verifying the transaction by using the public
-
-//
-
-//XRPL seed of wallet some of kind of request to network;
-//respond generates public key and private key;
-
-// transaction pool -> miners -> block -> blockchain
-
-// Transaction pool
-
-// 20 node;
-
-// 0  genesis block
-
 pragma solidity >=0.7.0 <0.9.0;
 
 /**
@@ -38,10 +10,7 @@ contract Ballot {
     struct Voter {
         uint weight; // weight is accumulated by delegation
         bool voted; // if true, that person already voted
-        //address is a 20 byte value;
         address delegate; // person delegated to
-        // uint is unsigned integer, 256 bits
-        // int is signed integer, 256 bits
         uint vote; // index of the voted proposal
     }
 
@@ -57,6 +26,13 @@ contract Ballot {
     mapping(address => Voter) public voters;
 
     Proposal[] public proposals;
+    modifier isChairPerson() {
+        require(
+            msg.sender == chairperson,
+            "Only chairperson can give right to vote."
+        );
+        _;
+    }
 
     /**
      * @dev Create a new ballot to choose one of 'proposalNames'.
@@ -78,13 +54,12 @@ contract Ballot {
      * @dev Give 'voter' the right to vote on this ballot. May only be called by 'chairperson'.
      * @param voter address of voter
      */
-    function giveRightToVote(address voter) public {
-        require(
-            msg.sender == chairperson,
-            "Only chairperson can give right to vote."
-        );
+    function giveRightToVote(address voter) public isChairPerson {
         require(!voters[voter].voted, "The voter already voted.");
-        require(voters[voter].weight == 0);
+        require(
+            voters[voter].weight == 0,
+            "The voter already has weight and didn't vote yet."
+        );
         voters[voter].weight = 1;
     }
 
@@ -130,8 +105,8 @@ contract Ballot {
 
         // If 'proposal' is out of the range of the array,
         // this will throw automatically and revert all
-        proposals[proposal].voteCount += sender.weight;
         // changes.
+        proposals[proposal].voteCount += sender.weight;
     }
 
     /**
@@ -154,16 +129,5 @@ contract Ballot {
      */
     function winnerName() public view returns (bytes32 winnerName_) {
         winnerName_ = proposals[winningProposal()].name;
-    }
-
-    function getProposal(
-        uint index
-    ) public view returns (bytes32 name, uint voteCount) {
-        name = proposals[index].name;
-        voteCount = proposals[index].voteCount;
-    }
-
-    function getProposals() public view returns (Proposal[] memory) {
-        return proposals;
     }
 }
