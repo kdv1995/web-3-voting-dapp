@@ -21,11 +21,22 @@ import type {
   TypedContractMethod,
 } from "./common";
 
+export declare namespace Ballot {
+  export type ProposalStruct = { name: BytesLike; voteCount: BigNumberish };
+
+  export type ProposalStructOutput = [name: string, voteCount: bigint] & {
+    name: string;
+    voteCount: bigint;
+  };
+}
+
 export interface BallotInterface extends Interface {
   getFunction(
     nameOrSignature:
       | "chairperson"
       | "delegate"
+      | "getProposals"
+      | "getVotesByProposal"
       | "giveRightToVote"
       | "proposals"
       | "vote"
@@ -41,6 +52,14 @@ export interface BallotInterface extends Interface {
   encodeFunctionData(
     functionFragment: "delegate",
     values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getProposals",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getVotesByProposal",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "giveRightToVote",
@@ -66,6 +85,14 @@ export interface BallotInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "delegate", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getProposals",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getVotesByProposal",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "giveRightToVote",
     data: BytesLike
@@ -127,6 +154,18 @@ export interface Ballot extends BaseContract {
 
   delegate: TypedContractMethod<[to: AddressLike], [void], "nonpayable">;
 
+  getProposals: TypedContractMethod<
+    [],
+    [Ballot.ProposalStructOutput[]],
+    "view"
+  >;
+
+  getVotesByProposal: TypedContractMethod<
+    [proposal: BigNumberish],
+    [bigint],
+    "view"
+  >;
+
   giveRightToVote: TypedContractMethod<
     [voter: AddressLike],
     [void],
@@ -168,6 +207,12 @@ export interface Ballot extends BaseContract {
   getFunction(
     nameOrSignature: "delegate"
   ): TypedContractMethod<[to: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "getProposals"
+  ): TypedContractMethod<[], [Ballot.ProposalStructOutput[]], "view">;
+  getFunction(
+    nameOrSignature: "getVotesByProposal"
+  ): TypedContractMethod<[proposal: BigNumberish], [bigint], "view">;
   getFunction(
     nameOrSignature: "giveRightToVote"
   ): TypedContractMethod<[voter: AddressLike], [void], "nonpayable">;

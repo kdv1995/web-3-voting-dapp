@@ -1,20 +1,29 @@
 import { credentials } from "@/constants";
-import { JsonRpcProvider, Contract } from "ethers";
-import BallotABI from "../../../web3/artifacts/contracts/Ballot.sol/Ballot.json";
+import { JsonRpcProvider, Contract, BrowserProvider } from "ethers";
+import BallotABI from "@/artifacts/contracts/Ballot.sol/Ballot.json";
+import { Signer } from "ethers";
+import { Provider } from "ethers";
 
 export function getProvider() {
   const provider = new JsonRpcProvider(credentials.rpcUrl);
   return provider;
 }
 
-export function getContract() {
-  const provider = getProvider();
+export function getContractReadOnly(provider: BrowserProvider | Provider) {
   const contract = new Contract(
     credentials.contractAddress,
     BallotABI.abi,
     provider,
   );
-  return contract;
+  return { contract };
+}
+export function getContractStateChanges(singer: Signer) {
+  const contract = new Contract(
+    credentials.contractAddress,
+    BallotABI.abi,
+    singer,
+  );
+  return { contract };
 }
 
 export async function getSigner() {

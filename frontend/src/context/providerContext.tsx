@@ -1,6 +1,8 @@
 "use client";
-import { getContract } from "@/utils/ethers";
-import { Provider, Contract, Signer, ethers, BrowserProvider } from "ethers";
+import { useMetaMaskAuth } from "@/hooks/useMetamaskAuth";
+import { getProvider } from "@/utils/ethers";
+import { JsonRpcProvider, Signer } from "ethers";
+import { ethers, BrowserProvider } from "ethers";
 import { createContext, ReactNode, useEffect, useState } from "react";
 
 interface ProviderContextProps {
@@ -9,75 +11,61 @@ interface ProviderContextProps {
 
 //Context
 export const Web3Context = createContext<ProviderContextValues>({
-  isProviderConnected: false,
-  setProviderConnected: () => {},
-  contract: null,
+  address: null,
   provider: null,
-  setProvider: () => {},
-  connectWallet: () => {},
+  connectToMetaMask: () => { },
 });
 
 //Interface of context values
 interface ProviderContextValues {
-  isProviderConnected: boolean;
-  setProviderConnected: (isConnected: boolean) => void;
-  contract: Contract | null;
-  provider: Provider | null;
-  setProvider: (provider: Provider) => void;
-  connectWallet: () => void;
+  address: string | null;
+  provider: BrowserProvider | JsonRpcProvider | null;
+  connectToMetaMask: () => void;
 }
 
 //Provider
 export function Web3NetworkProvider({ children }: ProviderContextProps) {
-  const [isProviderConnected, setProviderConnected] = useState<boolean>(false);
-  const [contract, setContract] = useState<Contract | null>(null);
-  const [provider, setProvider] = useState<Provider | BrowserProvider | null>(
-    null,
-  );
+  const [provider, setProvider] = useState<
+    BrowserProvider | null | JsonRpcProvider
+  >(null);
+  const [address, setAddress] = useState<string | null>(null);
 
-  const connectWallet = async () => {
-    let signer = null;
+  const checkAuthStatus = async () => {
+    const accounts = await window.ethereum.request({
+      method: "eth_accounts",
+    });
 
-    let provider;
-    if (window?.ethereum == null) {
-      // If MetaMask is not installed, we use the default provider,
-      // which is backed by a variety of third-party services (such
-      // as INFURA). They do not have private keys installed,
-      // so they only have read-only access
-      console.log("MetaMask not installed; using read-only defaults");
-      provider = ethers.getDefaultProvider();
-      setProvider(provider);
-      setProviderConnected(true);
-    } else {
-      // Connect to the MetaMask EIP-1193 object. This is a standard
-      // protocol that allows Ethers access to make all read-only
-      // requests through MetaMask.
-      provider = new ethers.BrowserProvider(window?.ethereum);
-      setProvider(provider);
-
-      // It also provides an opportunity to request access to write
-      // operations, which will be performed by the private key
-      // that MetaMask manages for the user.
-      signer = await provider.getSigner();
-      setProviderConnected(true);
+    if (accounts.length > 0) {
+      const provider = new BrowserProvider(window.ethereum);
+      await provider.getSigner().then((signer) => {
+        setAddress(signer.address);
+        setProvider(provider);
+      });
     }
   };
 
   useEffect(() => {
-    const contract = getContract();
-    setContract(contract);
+    checkAuthStatus();
+    if (window.ethereum) {
+      const provider = new BrowserProvider(window.ethereum);
+
+      setProvider(provider);
+    } else {
+      setProvider(getProvider());
+    }
   }, []);
 
-  const contextValues: ProviderContextValues = {
-    contract,
-    provider,
-    setProvider,
-    connectWallet,
-    isProviderConnected,
-    setProviderConnected,
+  const connectToMetaMask = async () => {
+    await provider?.getSigner().then((signer) => {
+      setAddress(signer.address);
+    });
   };
-  console.log(contextValues);
 
+  const contextValues = {
+    address,
+    provider,
+    connectToMetaMask,
+  };
   return (
     <Web3Context.Provider value={contextValues}>
       {children}

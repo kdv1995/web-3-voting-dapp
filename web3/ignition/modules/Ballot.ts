@@ -1,4 +1,5 @@
 import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
+import "@nomicfoundation/hardhat-ignition";
 
 const BallotModule = buildModule("BallotModule", (m) => {
   // Define candidates (proposal names) as bytes32 array
